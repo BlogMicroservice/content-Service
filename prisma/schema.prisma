@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql" // or "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Post {
+  id           String       @id @default(uuid())
+  userId       String       // user from external user service
+  title        String
+  summary      String?
+  content      String
+  thumbnailUrl String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  published    Boolean      @default(false)
+
+  images       PostImage[]
+  topics       PostTopic[]
+  likes        PostLike[]
+}
+
+model PostImage {
+  id       String @id @default(uuid())
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  imageUrl String
+  altText  String?
+}
+
+model Topic {
+  id    String       @id @default(uuid())
+  name  String       @unique
+  posts PostTopic[]
+}
+
+model PostTopic {
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  topic    Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  topicId  String
+
+  @@id([postId, topicId])
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  userId    String   // user from user service
+  likedAt   DateTime @default(now())
+
+  @@unique([postId, userId])
+}

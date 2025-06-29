@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  postgres_content:
+    image: postgres:14-alpine
+    ports:
+      - 5023:5432
+    volumes:
+      - ~/apps/postgres_content:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=S3cret
+      - POSTGRES_USER=citizix_user
+      - POSTGRES_DB=citizix_db_content
+
